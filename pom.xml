@@ -120,6 +120,8 @@
                     <include>*.yml</include>
                     <include>*.properties</include>
                     <include>*.xml</include>
+                    <include>enc_pri</include>
+                    <include>enc_pub</include>
                 </includes>
             </resource>
         </resources>
