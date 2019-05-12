@@ -1,5 +1,7 @@
 package com.nanahana.bicyclesharing.security;
 
+import lombok.Data;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,9 +11,11 @@ import java.io.OutputStream;
  * @Date 2019/5/8 20:27
  * @Description Base64编码工具
  */
-public class Base64Util {
+@Data
+public class Base64Utils {
 
-    private static final char[] LEGAL_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".toCharArray();
+    private static final char[] LEGAL_CHARS =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".toCharArray();
 
     public static String encode(byte[] data) {
         byte start = 0;
@@ -51,6 +55,46 @@ public class Base64Util {
         return buf.toString();
     }
 
+    public static byte[] decode(String s) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            decode(s, bos);
+        } catch (IOException var5) {
+            throw new RuntimeException();
+        }
+        return bos.toByteArray();
+    }
+
+    private static void decode(String s, OutputStream os) throws IOException {
+        int i = 0;
+        int len = s.length();
+
+        while (true) {
+            while (i < len && s.charAt(i) <= 32) {
+                ++i;
+            }
+
+            if (i == len) {
+                break;
+            }
+
+            int tri = (decode(s.charAt(i)) << 18) + (decode(s.charAt(i + 1)) << 12) + (decode(s.charAt(i + 2)) << 6)
+                + decode(s.charAt(i + 3));
+            os.write(tri >> 16 & 255);
+            if (s.charAt(i + 2) == 61) {
+                break;
+            }
+
+            os.write(tri >> 8 & 255);
+            if (s.charAt(i + 3) == 61) {
+                break;
+            }
+
+            os.write(tri & 255);
+            i += 4;
+        }
+    }
+
     private static int decode(char c) {
         if (c >= 65 && c <= 90) {
             return c - 65;
@@ -72,54 +116,4 @@ public class Base64Util {
         }
     }
 
-    public static byte[] decode(String s) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        try {
-            decode(s, bos);
-        } catch (IOException var5) {
-            throw new RuntimeException();
-        }
-
-        byte[] decodedBytes = bos.toByteArray();
-
-        try {
-            bos.close();
-            bos = null;
-        } catch (IOException var4) {
-            System.err.println("Error while decoding BASE64: " + var4.toString());
-        }
-
-        return decodedBytes;
-    }
-
-    private static void decode(String s, OutputStream os) throws IOException {
-        int i = 0;
-        int len = s.length();
-
-        while (true) {
-            while (i < len && s.charAt(i) <= 32) {
-                ++i;
-            }
-
-            if (i == len) {
-                break;
-            }
-
-            int tri = (decode(s.charAt(i)) << 18) + (decode(s.charAt(i + 1)) << 12) + (decode(s.charAt(i + 2)) << 6)
-                    + decode(s.charAt(i + 3));
-            os.write(tri >> 16 & 255);
-            if (s.charAt(i + 2) == 61) {
-                break;
-            }
-
-            os.write(tri >> 8 & 255);
-            if (s.charAt(i + 3) == 61) {
-                break;
-            }
-
-            os.write(tri & 255);
-            i += 4;
-        }
-    }
 }

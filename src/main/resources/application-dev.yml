@@ -1,7 +1,26 @@
-#datasource dev
+# spring
 spring:
+  # datasource
   datasource:
     name: test
-    url: jdbc:mysql://localhost:3306/bicycle-sharing
+    url: jdbc:mysql://localhost:3306/bicycle-sharing?serverTimezone=GMT%2B8
     username: root
     password: qwe123
+  # activeMQ
+  activemq:
+    broker-url: tcp://localhost:61616
+    pool:
+      enabled: false
+  # data-mongodb
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/bicycle-sharing
+
+---
+# redis
+redis:
+  host: 127.0.0.1
+  port: 6379
+  max-idle: 5
+  max-total: 10
+  max-wait-millis: 3000
